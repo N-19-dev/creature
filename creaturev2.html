@@ -1,0 +1,1539 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ma Petite Créature — MVP</title>
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --panel: #111827;
+      --muted: #94a3b8;
+      --text: #f1f5f9;
+      --accent: #38bdf8;
+      --good: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --purple: #a855f7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background: radial-gradient(ellipse 1200px 800px at 50% -200px, #1e1b4b, var(--bg));
+      color: var(--text);
+      font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    .stars { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+    .star { position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%; opacity: 0.6; animation: twinkle 3s ease-in-out infinite; }
+    @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.9; } }
+    
+    .app { width: min(1200px, 100%); display: grid; gap: 20px; position: relative; z-index: 1; }
+    
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 20px;
+      background: rgba(17, 24, 39, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+    
+    h1 {
+      font-size: clamp(22px, 4vw, 36px);
+      font-weight: 800;
+      background: linear-gradient(135deg, #38bdf8, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+    
+    .stats-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .card {
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    
+    .grid {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+    
+    .grid-3 {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .spacer { flex: 1; }
+    
+    button, input[type="number"], input[type="text"] {
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: rgba(11, 18, 32, 0.8);
+      color: var(--text);
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+    }
+    
+    button {
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    button:active {
+      transform: translateY(0) scale(0.98);
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      border: none;
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+    }
+    
+    .btn.good {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+    }
+    
+    .btn.bad {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    }
+    
+    .btn.purple {
+      background: linear-gradient(135deg, #a855f7, #9333ea);
+      box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+    }
+    
+    .btn.orange {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    }
+    
+    .stat {
+      padding: 8px 14px;
+      background: rgba(11, 18, 32, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      white-space: nowrap;
+    }
+    
+    .stat.streak {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border-color: #f59e0b;
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3); }
+      50% { box-shadow: 0 4px 20px rgba(245, 158, 11, 0.6); }
+    }
+    
+    .meter {
+      height: 14px;
+      background: rgba(148, 163, 184, 0.15);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .meter > i {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #22c55e, #84cc16);
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+    }
+    
+    .meter.mood > i {
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+    
+    .creature-wrap {
+      position: relative;
+      height: 360px;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.05), transparent 70%);
+      border-radius: 20px;
+    }
+    
+    .creature-box {
+      position: relative;
+      width: 240px;
+      height: 240px;
+      display: grid;
+      place-items: center;
+    }
+    
+    .creature-img {
+      width: 200px;
+      height: 200px;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.4));
+      transition: transform 0.3s ease, filter 0.3s ease, opacity 0.15s ease;
+      object-fit: contain;
+    }
+    
+    .creature-img.happy {
+      filter: drop-shadow(0 15px 35px rgba(34, 197, 94, 0.5)) brightness(1.1);
+    }
+    
+    .creature-img.sad {
+      filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.4)) brightness(0.8) saturate(0.7);
+    }
+    
+    @keyframes bob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-8px) rotate(-2deg); }
+      50% { transform: translateY(-12px) rotate(0deg); }
+      75% { transform: translateY(-8px) rotate(2deg); }
+    }
+    
+    .anim-bob {
+      animation: bob 3.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15) rotate(5deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    
+    .pulse {
+      animation: pulse 0.4s ease-out;
+    }
+    
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg); }
+      10% { transform: rotate(-8deg); }
+      30% { transform: rotate(8deg); }
+      50% { transform: rotate(-6deg); }
+      70% { transform: rotate(6deg); }
+      90% { transform: rotate(-3deg); }
+    }
+    
+    .wiggle {
+      animation: wiggle 0.6s ease-in-out;
+    }
+    
+    @keyframes jump {
+      0%, 100% { transform: translateY(0) scale(1, 1); }
+      40% { transform: translateY(-40px) scale(1.1, 0.9); }
+      50% { transform: translateY(-50px) scale(1.15, 0.85); }
+      60% { transform: translateY(-40px) scale(1.1, 0.9); }
+    }
+    
+    .jump {
+      animation: jump 0.8s ease-out;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) scaleY(1); }
+      20% { transform: translateY(0) scaleY(0.9) scaleX(1.1); }
+      40% { transform: translateY(-30px) scaleY(1.1) scaleX(0.9); }
+      60% { transform: translateY(-15px) scaleY(1.05) scaleX(0.95); }
+      80% { transform: translateY(-5px) scaleY(1.02) scaleX(0.98); }
+    }
+    
+    .bounce {
+      animation: bounce 0.6s ease-out;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.2); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    
+    .spin {
+      animation: spin 0.8s ease-in-out;
+    }
+    
+    .particle {
+      position: absolute;
+      pointer-events: none;
+      font-size: 24px;
+      animation: float-up 1.5s ease-out forwards;
+    }
+    
+    @keyframes float-up {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+    }
+    
+    .sparkle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: radial-gradient(circle, #fbbf24, transparent);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: sparkle-float 1s ease-out forwards;
+    }
+    
+    @keyframes sparkle-float {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+    }
+    
+    .goal-list {
+      max-height: 200px;
+      overflow: auto;
+      display: grid;
+      gap: 8px;
+    }
+    
+    .goal-item {
+      background: rgba(11, 18, 32, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 14px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .goal-item:hover {
+      border-color: var(--good);
+      background: rgba(34, 197, 94, 0.1);
+      transform: translateX(4px);
+    }
+    
+    .goal-reward {
+      background: rgba(34, 197, 94, 0.2);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--good);
+    }
+    
+    .log {
+      max-height: 180px;
+      overflow: auto;
+      display: grid;
+      gap: 8px;
+      font-size: 14px;
+    }
+    
+    .log::-webkit-scrollbar, .goal-list::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .log::-webkit-scrollbar-track, .goal-list::-webkit-scrollbar-track {
+      background: rgba(148, 163, 184, 0.1);
+      border-radius: 10px;
+    }
+    
+    .log::-webkit-scrollbar-thumb, .goal-list::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 10px;
+    }
+    
+    .log .item {
+      background: rgba(11, 18, 32, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-left: 3px solid var(--accent);
+      border-radius: 10px;
+      padding: 10px 14px;
+      transition: all 0.2s ease;
+    }
+    
+    .log .item:hover {
+      background: rgba(11, 18, 32, 0.9);
+      border-left-color: var(--purple);
+    }
+    
+    .label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
+    
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      font-style: italic;
+    }
+    
+    footer {
+      text-align: center;
+      opacity: 0.7;
+      font-size: 13px;
+      padding: 20px;
+      color: var(--muted);
+    }
+    
+    hr {
+      border: none;
+      border-top: 1px solid rgba(148, 163, 184, 0.15);
+      margin: 16px 0;
+    }
+    
+    .section-title {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .achievement-popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #a855f7, #9333ea);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+      animation: slide-in 0.5s ease-out;
+      z-index: 1000;
+      font-weight: 600;
+    }
+    
+    @keyframes slide-in {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    /* Mini-game modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      display: none;
+      place-items: center;
+      z-index: 2000;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .modal.active {
+      display: grid;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .modal-content {
+      background: rgba(17, 24, 39, 0.95);
+      border: 2px solid rgba(148, 163, 184, 0.3);
+      border-radius: 24px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+      animation: slideUp 0.3s ease;
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 24px 0;
+    }
+    
+    .game-btn {
+      aspect-ratio: 1;
+      font-size: 32px;
+      display: grid;
+      place-items: center;
+      background: rgba(56, 189, 248, 0.2);
+      border: 2px solid rgba(56, 189, 248, 0.3);
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .game-btn:hover {
+      background: rgba(56, 189, 248, 0.3);
+      transform: scale(1.05);
+    }
+    
+    .game-btn.active {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border-color: #22c55e;
+      animation: pulse 0.3s ease;
+    }
+    
+    .game-btn.wrong {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      border-color: #ef4444;
+      animation: wiggle 0.3s ease;
+    }
+    
+    .game-timer {
+      font-size: 48px;
+      font-weight: 800;
+      text-align: center;
+      background: linear-gradient(135deg, #38bdf8, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .game-score {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      margin: 16px 0;
+    }
+    
+    /* Stats display */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    
+    .stat-box {
+      background: rgba(11, 18, 32, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #38bdf8, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 4px;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  
+  <div class="app">
+    <header>
+      <h1>✨ Ma Petite Créature</h1>
+      <div class="stats-row">
+        <span class="stat" id="statLevel">Niveau 1</span>
+        <span class="stat" id="statFood">🍎 0</span>
+        <span class="stat" id="statXP">XP 0/20</span>
+        <span class="stat" id="statStage">Stage 1/4</span>
+        <span class="stat" id="statMood">💙 100%</span>
+        <span class="stat streak" id="statStreak" style="display: none;">🔥 0 jours</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Creature panel -->
+      <section class="card">
+        <div class="section-title">
+          🎨 Ta créature
+          <span class="spacer"></span>
+          <div style="width:180px" class="meter" title="Progression vers le prochain niveau">
+            <i id="xpBar" style="width:0%"></i>
+          </div>
+        </div>
+        
+        <div class="creature-wrap">
+          <div id="creatureBox" class="creature-box anim-bob">
+            <img id="creatureImg" class="creature-img" src="assets/creature/stage1.png" alt="Ma créature" />
+          </div>
+        </div>
+        
+        <div class="row" style="margin-top: 16px;">
+          <button class="btn good" id="btnFeed">🍎 Nourrir</button>
+          <button class="btn purple" id="btnPet">💕 Caresser</button>
+          <button class="btn orange" id="btnPlay">🎮 Jouer</button>
+          <button class="btn bad" id="btnReset" style="margin-left: auto;">🔄 Reset</button>
+        </div>
+        
+        <div class="row" style="margin-top: 12px;">
+          <div style="flex: 1;" class="meter mood" title="Humeur / Satiété">
+            <i id="moodBar" style="width:100%"></i>
+          </div>
+          <span class="hint">L'humeur diminue avec le temps ⏰</span>
+        </div>
+      </section>
+
+      <!-- Goals panel -->
+      <section class="card">
+        <div class="section-title">🎯 Objectifs quotidiens</div>
+        
+        <div class="row" style="gap:8px; margin-bottom:12px">
+          <input id="goalText" type="text" placeholder="Ex: 30 min de sport" style="flex: 1;" />
+          <input id="goalFood" type="number" min="1" max="10" value="1" style="width: 70px;" />
+          <button class="btn" id="btnAddGoal">➕</button>
+        </div>
+        
+        <div id="goalList" class="goal-list"></div>
+        
+        <hr/>
+        
+        <button id="btnCompleteRandom" class="btn good" style="width: 100%;">
+          ✅ Valider un objectif
+        </button>
+      </section>
+    </div>
+
+    <!-- Stats panel -->
+    <section class="card">
+      <div class="section-title">📊 Statistiques</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-value" id="statTotalFood">0</div>
+          <div class="stat-label">🍎 Nourriture totale</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statTotalGoals">0</div>
+          <div class="stat-label">✅ Objectifs complétés</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statTotalFeeds">0</div>
+          <div class="stat-label">🍽️ Fois nourri</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statTotalPets">0</div>
+          <div class="stat-label">💕 Caresses données</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statTotalPlays">0</div>
+          <div class="stat-label">🎮 Parties jouées</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statBestStreak">0</div>
+          <div class="stat-label">🔥 Meilleure série</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statPlayTime">0h</div>
+          <div class="stat-label">⏱️ Temps de jeu</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statHighestLevel">1</div>
+          <div class="stat-label">🏆 Niveau max atteint</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- History -->
+    <section class="card">
+      <div class="section-title">📜 Historique</div>
+      <div id="history" class="log"></div>
+    </section>
+
+    <footer>
+      🌟 Prototype local • Aucune donnée envoyée • Tout reste dans votre navigateur
+    </footer>
+  </div>
+
+  <!-- Mini-game Modal -->
+  <div id="gameModal" class="modal">
+    <div class="modal-content">
+      <h2 style="text-align: center; margin-bottom: 16px;">🎮 Mini-Jeu: Mémoire</h2>
+      <p style="text-align: center; color: var(--muted); margin-bottom: 8px;">Mémorise la séquence et répète-la !</p>
+      <div class="game-timer" id="gameTimer">3</div>
+      <div class="game-score" id="gameScore">Score: 0</div>
+      <div class="game-grid" id="gameGrid"></div>
+      <button class="btn" id="btnCloseGame" style="width: 100%; margin-top: 16px;">Fermer</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== UTILITY FUNCTIONS =====
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => document.querySelectorAll(sel);
+    
+    // ===== STATE MANAGEMENT =====
+    const state = {
+      level: 1,
+      xp: 0,
+      mood: 100,
+      food: 0,
+      goals: [
+        { text: "Boire 1L d'eau", food: 1 },
+        { text: "30 min d'exercice", food: 2 },
+        { text: "Méditer 10 minutes", food: 1 }
+      ],
+      history: [],
+      lastMoodDecay: Date.now(),
+      
+      // Streaks
+      streak: 0,
+      lastGoalDate: null,
+      bestStreak: 0,
+      streakMultiplier: 1,
+      
+      // Stats
+      stats: {
+        totalFood: 0,
+        totalGoals: 0,
+        totalFeeds: 0,
+        totalPets: 0,
+        totalPlays: 0,
+        playTimeStart: Date.now(),
+        highestLevel: 1
+      },
+      
+      // Mini-game
+      gameInProgress: false,
+      lastPlayTime: 0
+    };
+
+    // ===== CONSTANTS =====
+    const XP_PER_FEED = 5;
+    const XP_PER_PET = 2;
+    const XP_PER_PLAY = 3;
+    const MOOD_DECAY_MS = 20000;
+    const MOOD_DECAY_AMOUNT = 3;
+    const LEVEL_CURVE = (lvl) => 20 + (lvl - 1) * 10;
+    const PLAY_COOLDOWN_MS = 60000; // 1 minute cooldown
+    
+    // ===== CREATURE STAGES =====
+    function computeStage(level) {
+      if (level >= 10) return 4;
+      if (level >= 7) return 3;
+      if (level >= 4) return 2;
+      return 1;
+    }
+
+    // ===== STORAGE =====
+    const persist = () => localStorage.setItem('pet-mvp-v3', JSON.stringify(state));
+    
+    const load = () => {
+      const raw = localStorage.getItem('pet-mvp-v3');
+      if (!raw) return;
+      try {
+        const s = JSON.parse(raw);
+        Object.assign(state, s);
+        // Reset play time start
+        state.stats.playTimeStart = Date.now();
+      } catch (e) {
+        console.error('Load error:', e);
+      }
+    };
+
+    // ===== TIME FORMATTING =====
+    const fmt = (date = new Date()) => 
+      new Intl.DateTimeFormat('fr-FR', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      }).format(date);
+    
+    const fmtDate = (date = new Date()) =>
+      new Intl.DateTimeFormat('fr-FR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).format(date);
+
+    // ===== HISTORY =====
+    function pushHistory(text) {
+      state.history.unshift({ t: Date.now(), text });
+      state.history = state.history.slice(0, 100);
+    }
+
+    // ===== STREAK SYSTEM =====
+    function checkStreak() {
+      const today = fmtDate();
+      
+      if (!state.lastGoalDate) {
+        return;
+      }
+      
+      const lastDate = new Date(state.lastGoalDate);
+      const todayDate = new Date();
+      const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays > 1) {
+        // Streak broken
+        if (state.streak > 0) {
+          pushHistory(`💔 Série perdue (${state.streak} jours)`);
+        }
+        state.streak = 0;
+        state.streakMultiplier = 1;
+      }
+    }
+    
+    function updateStreak() {
+      const today = fmtDate();
+      
+      if (state.lastGoalDate === today) {
+        return; // Already counted today
+      }
+      
+      const lastDate = state.lastGoalDate ? new Date(state.lastGoalDate) : null;
+      const todayDate = new Date();
+      
+      if (!lastDate) {
+        // First goal ever
+        state.streak = 1;
+      } else {
+        const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 1) {
+          // Consecutive day
+          state.streak += 1;
+          pushHistory(`🔥 Série de ${state.streak} jours !`);
+          
+          if (state.streak > state.bestStreak) {
+            state.bestStreak = state.streak;
+            showAchievement(`🏆 Nouveau record: ${state.streak} jours !`);
+          }
+          
+          // Milestones
+          if (state.streak === 7) {
+            showAchievement('🎉 1 semaine de série !');
+            spawnSparkles(30);
+          } else if (state.streak === 30) {
+            showAchievement('🌟 1 mois de série !!');
+            spawnSparkles(50);
+          }
+        } else if (diffDays === 0) {
+          // Same day, don't increment
+          return;
+        } else {
+          // Streak broken (already handled in checkStreak)
+          state.streak = 1;
+        }
+      }
+      
+      state.lastGoalDate = today;
+      
+      // Calculate multiplier (max 3x at 30 days)
+      state.streakMultiplier = Math.min(1 + (state.streak / 30) * 2, 3);
+    }
+
+    // ===== CREATURE IMAGE MANAGEMENT =====
+    function setCreatureImage(stage) {
+      const img = $('#creatureImg');
+      const url = `assets/creature/stage${stage}.png`;
+      
+      img.onerror = () => {
+        console.error(`Image manquante: ${url}`);
+        pushHistory(`⚠️ Image stage${stage}.png manquante`);
+      };
+      
+      img.style.opacity = '0';
+      setTimeout(() => {
+        img.src = url;
+        img.style.opacity = '1';
+      }, 150);
+    }
+    
+    function updateCreatureMood() {
+      const img = $('#creatureImg');
+      img.classList.remove('happy', 'sad');
+      
+      if (state.mood >= 70) {
+        img.classList.add('happy');
+      } else if (state.mood < 40) {
+        img.classList.add('sad');
+      }
+    }
+    
+    function animateCreature(type) {
+      const box = $('#creatureBox');
+      
+      box.classList.remove('pulse', 'wiggle', 'jump', 'bounce', 'spin');
+      void box.offsetWidth;
+      
+      switch(type) {
+        case 'feed':
+          box.classList.add('pulse');
+          setTimeout(() => {
+            box.classList.remove('pulse');
+            box.classList.add('bounce');
+            setTimeout(() => box.classList.remove('bounce'), 600);
+          }, 400);
+          break;
+          
+        case 'pet':
+          box.classList.add('wiggle');
+          setTimeout(() => box.classList.remove('wiggle'), 600);
+          break;
+          
+        case 'play':
+          box.classList.add('jump');
+          setTimeout(() => {
+            box.classList.remove('jump');
+            box.classList.add('wiggle');
+            setTimeout(() => box.classList.remove('wiggle'), 600);
+          }, 800);
+          break;
+          
+        case 'levelup':
+          box.classList.add('spin');
+          setTimeout(() => {
+            box.classList.remove('spin');
+            box.classList.add('bounce');
+            setTimeout(() => box.classList.remove('bounce'), 600);
+          }, 800);
+          break;
+      }
+    }
+
+    // ===== STATS =====
+    function updateStats() {
+      $('#statTotalFood').textContent = state.stats.totalFood;
+      $('#statTotalGoals').textContent = state.stats.totalGoals;
+      $('#statTotalFeeds').textContent = state.stats.totalFeeds;
+      $('#statTotalPets').textContent = state.stats.totalPets;
+      $('#statTotalPlays').textContent = state.stats.totalPlays;
+      $('#statBestStreak').textContent = state.bestStreak;
+      $('#statHighestLevel').textContent = state.stats.highestLevel;
+      
+      // Calculate play time
+      const elapsed = Date.now() - state.stats.playTimeStart;
+      const hours = Math.floor(elapsed / (1000 * 60 * 60));
+      const minutes = Math.floor((elapsed % (1000 * 60 * 60)) / (1000 * 60));
+      $('#statPlayTime').textContent = hours > 0 ? `${hours}h${minutes}m` : `${minutes}m`;
+    }
+
+    // ===== RENDER =====
+    function render() {
+      $('#statLevel').textContent = `Niveau ${state.level}`;
+      $('#statFood').textContent = `🍎 ${state.food}`;
+      
+      const need = LEVEL_CURVE(state.level);
+      const bonusXP = state.streakMultiplier > 1 ? ` (×${state.streakMultiplier.toFixed(1)})` : '';
+      $('#statXP').textContent = `XP ${state.xp}/${need}${bonusXP}`;
+      $('#xpBar').style.width = Math.min(100, (state.xp / need) * 100) + '%';
+
+      const moodEmoji = state.mood >= 70 ? '💙' : state.mood >= 40 ? '💛' : '💔';
+      $('#statMood').textContent = `${moodEmoji} ${Math.round(state.mood)}%`;
+      $('#moodBar').style.width = Math.max(0, Math.min(100, state.mood)) + '%';
+
+      const stage = computeStage(state.level);
+      $('#statStage').textContent = `Stage ${stage}/4`;
+
+      // Streak display
+      if (state.streak > 0) {
+        $('#statStreak').style.display = 'block';
+        $('#statStreak').textContent = `🔥 ${state.streak} jour${state.streak > 1 ? 's' : ''}`;
+      } else {
+        $('#statStreak').style.display = 'none';
+      }
+
+      setCreatureImage(stage);
+      updateCreatureMood();
+      
+      const img = $('#creatureImg');
+      const scale = 1 + (state.level - 1) * 0.03;
+      img.style.transform = `scale(${scale.toFixed(2)})`;
+
+      // Goals
+      const list = $('#goalList');
+      list.innerHTML = '';
+      state.goals.forEach((g, idx) => {
+        const el = document.createElement('div');
+        el.className = 'goal-item';
+        el.innerHTML = `
+          <div><strong>${g.text}</strong></div>
+          <div class="goal-reward">${g.food} 🍎</div>
+        `;
+        el.onclick = () => completeGoal(idx);
+        list.appendChild(el);
+      });
+
+      // History
+      const hist = $('#history');
+      hist.innerHTML = state.history
+        .map(h => `
+          <div class="item">
+            <span class="label">${fmt(new Date(h.t))}</span>
+            <div style="margin-top: 4px;">${h.text}</div>
+          </div>
+        `)
+        .join('');
+
+      // Stats
+      updateStats();
+      
+      // Update highest level
+      if (state.level > state.stats.highestLevel) {
+        state.stats.highestLevel = state.level;
+      }
+
+      persist();
+    }
+
+    // ===== ACTIONS =====
+    function gainFood(n) {
+      state.food += n;
+      state.stats.totalFood += n;
+      pushHistory(`+${n} 🍎 obtenue(s)`);
+      spawnParticles('🍎', n);
+      render();
+    }
+
+    function feed() {
+      if (state.food <= 0) {
+        pushHistory("❌ Pas assez de nourriture");
+        shake($('#btnFeed'));
+        render();
+        return;
+      }
+      
+      state.food -= 1;
+      const xpGain = Math.floor(XP_PER_FEED * state.streakMultiplier);
+      state.xp += xpGain;
+      state.mood = Math.min(100, state.mood + 10);
+      state.stats.totalFeeds += 1;
+      
+      const bonusText = state.streakMultiplier > 1 ? ` (×${state.streakMultiplier.toFixed(1)} bonus!)` : '';
+      pushHistory(`🍎 Nourri (+${xpGain} XP${bonusText}, +10% humeur)`);
+      
+      animateCreature('feed');
+      spawnParticles('🍎', 3);
+      spawnSparkles();
+      
+      maybeLevelUp();
+      render();
+    }
+
+    function pet() {
+      const xpGain = Math.floor(XP_PER_PET * state.streakMultiplier);
+      state.xp += xpGain;
+      state.mood = Math.min(100, state.mood + 5);
+      state.stats.totalPets += 1;
+      
+      const bonusText = state.streakMultiplier > 1 ? ` (×${state.streakMultiplier.toFixed(1)} bonus!)` : '';
+      pushHistory(`💕 Caresse (+${xpGain} XP${bonusText}, +5% humeur)`);
+      
+      animateCreature('pet');
+      spawnParticles('💕', 3);
+      
+      maybeLevelUp();
+      render();
+    }
+
+    function play() {
+      const now = Date.now();
+      const cooldownRemaining = PLAY_COOLDOWN_MS - (now - state.lastPlayTime);
+      
+      if (state.gameInProgress) {
+        return;
+      }
+      
+      if (cooldownRemaining > 0) {
+        const seconds = Math.ceil(cooldownRemaining / 1000);
+        pushHistory(`⏰ Cooldown: encore ${seconds}s`);
+        shake($('#btnPlay'));
+        render();
+        return;
+      }
+      
+      // Launch mini-game
+      startMiniGame();
+    }
+
+    function maybeLevelUp() {
+      let need = LEVEL_CURVE(state.level);
+      let leveledUp = false;
+      let oldStage = computeStage(state.level);
+      
+      while (state.xp >= need) {
+        state.xp -= need;
+        state.level += 1;
+        leveledUp = true;
+        
+        const newStage = computeStage(state.level);
+        if (newStage > oldStage) {
+          pushHistory(`🌟 ÉVOLUTION ! Stage ${newStage} atteint !`);
+          showAchievement(`🌟 ÉVOLUTION STAGE ${newStage} !`);
+        } else {
+          pushHistory(`✨ Niveau ${state.level} atteint !`);
+        }
+        
+        need = LEVEL_CURVE(state.level);
+        oldStage = newStage;
+      }
+      
+      if (leveledUp) {
+        animateCreature('levelup');
+        spawnSparkles(20);
+        showAchievement(`🎉 Niveau ${state.level} !`);
+      }
+    }
+
+    function decay() {
+      const now = Date.now();
+      const elapsed = now - state.lastMoodDecay;
+      
+      if (elapsed >= MOOD_DECAY_MS) {
+        state.mood = Math.max(0, state.mood - MOOD_DECAY_AMOUNT);
+        state.lastMoodDecay = now;
+        render();
+      }
+    }
+
+    function addGoal() {
+      const text = $('#goalText').value.trim();
+      const food = parseInt($('#goalFood').value, 10) || 1;
+      
+      if (!text) {
+        shake($('#goalText'));
+        return;
+      }
+      
+      state.goals.unshift({ 
+        text, 
+        food: Math.max(1, Math.min(10, food)) 
+      });
+      
+      $('#goalText').value = '';
+      pushHistory(`📝 Nouvel objectif: "${text}"`);
+      spawnParticles('✨', 3);
+      render();
+    }
+
+    function completeGoal(idx) {
+      const g = state.goals[idx];
+      if (!g) return;
+      
+      state.goals.splice(idx, 1);
+      state.stats.totalGoals += 1;
+      
+      checkStreak();
+      updateStreak();
+      
+      gainFood(g.food);
+      pushHistory(`✅ Objectif complété: "${g.text}"`);
+      showAchievement(`+${g.food} 🍎`);
+      spawnSparkles(8);
+      
+      render();
+    }
+
+    function completeRandom() {
+      if (!state.goals.length) {
+        pushHistory("❌ Aucun objectif disponible");
+        shake($('#btnCompleteRandom'));
+        render();
+        return;
+      }
+      completeGoal(0);
+    }
+
+    function resetAll() {
+      if (!confirm('Tout réinitialiser ? Cette action est irréversible.')) return;
+      
+      Object.assign(state, {
+        level: 1,
+        xp: 0,
+        mood: 100,
+        food: 0,
+        goals: [
+          { text: "Boire 1L d'eau", food: 1 },
+          { text: "30 min d'exercice", food: 2 },
+          { text: "Méditer 10 minutes", food: 1 }
+        ],
+        history: [],
+        lastMoodDecay: Date.now(),
+        streak: 0,
+        lastGoalDate: null,
+        bestStreak: 0,
+        streakMultiplier: 1,
+        stats: {
+          totalFood: 0,
+          totalGoals: 0,
+          totalFeeds: 0,
+          totalPets: 0,
+          totalPlays: 0,
+          playTimeStart: Date.now(),
+          highestLevel: 1
+        },
+        gameInProgress: false,
+        lastPlayTime: 0
+      });
+      
+      pushHistory("🔄 Jeu réinitialisé");
+      render();
+    }
+
+    // ===== MINI-GAME =====
+    let gameState = {
+      sequence: [],
+      playerSequence: [],
+      round: 0,
+      score: 0,
+      isShowingSequence: false
+    };
+
+    function startMiniGame() {
+      state.gameInProgress = true;
+      gameState = {
+        sequence: [],
+        playerSequence: [],
+        round: 0,
+        score: 0,
+        isShowingSequence: false
+      };
+      
+      $('#gameModal').classList.add('active');
+      $('#gameScore').textContent = 'Score: 0';
+      
+      // Create grid
+      const grid = $('#gameGrid');
+      grid.innerHTML = '';
+      const emojis = ['🍎', '💕', '⭐', '🎮', '🔥', '✨', '🌟', '💙', '🍀', '🎯', '🏆', '🎨', '🌈', '🎪', '🎭', '🎸'];
+      
+      for (let i = 0; i < 16; i++) {
+        const btn = document.createElement('div');
+        btn.className = 'game-btn';
+        btn.textContent = emojis[i];
+        btn.dataset.index = i;
+        btn.onclick = () => handleGameClick(i);
+        grid.appendChild(btn);
+      }
+      
+      nextRound();
+    }
+
+    function nextRound() {
+      gameState.round += 1;
+      gameState.playerSequence = [];
+      gameState.isShowingSequence = true;
+      
+      // Add new random position
+      const randomIndex = Math.floor(Math.random() * 16);
+      gameState.sequence.push(randomIndex);
+      
+      // Show countdown
+      let countdown = 3;
+      $('#gameTimer').textContent = countdown;
+      
+      const countInterval = setInterval(() => {
+        countdown -= 1;
+        if (countdown > 0) {
+          $('#gameTimer').textContent = countdown;
+        } else {
+          clearInterval(countInterval);
+          $('#gameTimer').textContent = 'Mémorise !';
+          showSequence();
+        }
+      }, 1000);
+    }
+
+    function showSequence() {
+      const buttons = $('.game-btn');
+      let index = 0;
+      
+      const showNext = () => {
+        if (index >= gameState.sequence.length) {
+          gameState.isShowingSequence = false;
+          $('#gameTimer').textContent = 'À toi !';
+          return;
+        }
+        
+        const btnIndex = gameState.sequence[index];
+        const btn = buttons[btnIndex];
+        
+        btn.classList.add('active');
+        setTimeout(() => {
+          btn.classList.remove('active');
+          index += 1;
+          setTimeout(showNext, 300);
+        }, 600);
+      };
+      
+      showNext();
+    }
+
+    function handleGameClick(index) {
+      if (gameState.isShowingSequence) return;
+      
+      const buttons = $('.game-btn');
+      const btn = buttons[index];
+      
+      gameState.playerSequence.push(index);
+      btn.classList.add('active');
+      setTimeout(() => btn.classList.remove('active'), 200);
+      
+      // Check if correct
+      const currentStep = gameState.playerSequence.length - 1;
+      
+      if (gameState.sequence[currentStep] !== index) {
+        // Wrong!
+        btn.classList.add('wrong');
+        setTimeout(() => btn.classList.remove('wrong'), 300);
+        endGame(false);
+        return;
+      }
+      
+      // Check if sequence complete
+      if (gameState.playerSequence.length === gameState.sequence.length) {
+        // Round complete!
+        gameState.score += gameState.round * 10;
+        $('#gameScore').textContent = `Score: ${gameState.score}`;
+        
+        setTimeout(() => {
+          if (gameState.round >= 5) {
+            // Won!
+            endGame(true);
+          } else {
+            nextRound();
+          }
+        }, 800);
+      }
+    }
+
+    function endGame(won) {
+      gameState.isShowingSequence = true;
+      
+      if (won) {
+        $('#gameTimer').textContent = '🎉 Gagné !';
+        const reward = Math.floor(gameState.score / 10);
+        const xpGain = Math.floor((XP_PER_PLAY + reward) * state.streakMultiplier);
+        
+        state.xp += xpGain;
+        state.mood = Math.min(100, state.mood + 15);
+        state.food += reward;
+        state.stats.totalFood += reward;
+        state.stats.totalPlays += 1;
+        
+        const bonusText = state.streakMultiplier > 1 ? ` (×${state.streakMultiplier.toFixed(1)} bonus!)` : '';
+        pushHistory(`🎮 Mini-jeu réussi ! +${xpGain} XP${bonusText}, +${reward} 🍎, +15% humeur`);
+        
+        showAchievement(`🎉 +${xpGain} XP, +${reward} 🍎 !`);
+        spawnSparkles(15);
+      } else {
+        $('#gameTimer').textContent = '😢 Perdu';
+        const xpGain = Math.floor(XP_PER_PLAY * state.streakMultiplier);
+        state.xp += xpGain;
+        state.mood = Math.min(100, state.mood + 5);
+        state.stats.totalPlays += 1;
+        
+        pushHistory(`🎮 Mini-jeu perdu. +${xpGain} XP, +5% humeur`);
+      }
+      
+      state.lastPlayTime = Date.now();
+      state.gameInProgress = false;
+      
+      maybeLevelUp();
+      render();
+      
+      setTimeout(() => {
+        $('#gameModal').classList.remove('active');
+      }, 2000);
+    }
+
+    $('#btnCloseGame').onclick = () => {
+      if (gameState.isShowingSequence) return;
+      
+      $('#gameModal').classList.remove('active');
+      state.gameInProgress = false;
+      
+      if (gameState.round > 0) {
+        const xpGain = Math.floor(XP_PER_PLAY * state.streakMultiplier);
+        state.xp += xpGain;
+        state.mood = Math.min(100, state.mood + 3);
+        state.stats.totalPlays += 1;
+        state.lastPlayTime = Date.now();
+        
+        pushHistory(`🎮 Mini-jeu abandonné. +${xpGain} XP, +3% humeur`);
+        maybeLevelUp();
+        render();
+      }
+    };
+
+    // ===== VISUAL EFFECTS =====
+    function spawnParticles(emoji, count = 5) {
+      const box = $('#creatureBox');
+      const rect = box.getBoundingClientRect();
+      
+      for (let i = 0; i < count; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.textContent = emoji;
+        particle.style.left = (rect.width / 2 + (Math.random() - 0.5) * 60) + 'px';
+        particle.style.top = (rect.height / 2 + (Math.random() - 0.5) * 60) + 'px';
+        box.appendChild(particle);
+        
+        setTimeout(() => particle.remove(), 1500);
+      }
+    }
+
+    function spawnSparkles(count = 10) {
+      const box = $('#creatureBox');
+      
+      for (let i = 0; i < count; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 50 + Math.random() * 80;
+        const x = Math.cos(angle) * distance;
+        const y = Math.sin(angle) * distance;
+        
+        sparkle.style.left = '50%';
+        sparkle.style.top = '50%';
+        sparkle.style.setProperty('--x', x + 'px');
+        sparkle.style.setProperty('--y', y + 'px');
+        
+        box.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 1000);
+      }
+    }
+
+    function shake(element) {
+      element.style.animation = 'none';
+      setTimeout(() => {
+        element.style.animation = 'wiggle 0.3s ease-in-out';
+      }, 10);
+      setTimeout(() => {
+        element.style.animation = '';
+      }, 310);
+    }
+
+    function showAchievement(text) {
+      const popup = document.createElement('div');
+      popup.className = 'achievement-popup';
+      popup.textContent = text;
+      document.body.appendChild(popup);
+      
+      setTimeout(() => {
+        popup.style.animation = 'slide-in 0.5s ease-out reverse';
+        setTimeout(() => popup.remove(), 500);
+      }, 2500);
+    }
+
+    // ===== BACKGROUND STARS =====
+    function createStars() {
+      const container = $('#stars');
+      const starCount = 50;
+      
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        star.style.animationDuration = (2 + Math.random() * 2) + 's';
+        container.appendChild(star);
+      }
+    }
+
+    // ===== EVENT LISTENERS =====
+    $('#btnFeed').onclick = feed;
+    $('#btnPet').onclick = pet;
+    $('#btnPlay').onclick = play;
+    $('#btnAddGoal').onclick = addGoal;
+    $('#btnCompleteRandom').onclick = completeRandom;
+    $('#btnReset').onclick = resetAll;
+
+    $('#goalText').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') addGoal();
+    });
+
+    // ===== INITIALIZATION =====
+    function preloadImages() {
+      [1, 2, 3, 4].forEach(stage => {
+        const img = new Image();
+        img.src = `assets/creature/stage${stage}.png`;
+        img.onerror = () => console.warn(`Image stage${stage}.png non trouvée`);
+      });
+    }
+    
+    preloadImages();
+    createStars();
+    load();
+    checkStreak();
+    render();
+    
+    setInterval(decay, 1000);
+    setInterval(persist, 30000);
+    
+    console.log('🎮 Ma Petite Créature v3 chargée !');
+    console.log('✨ Nouvelles fonctionnalités: Streaks, Mini-jeu, Statistiques');
+  </script>
+</body>
+</html>
