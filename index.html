@@ -6,20 +6,22 @@
   <title>Ma Petite Créature — MVP</title>
   <style>
     :root {
-      --bg: #0a0e1a;
-      --panel: #111827;
-      --muted: #94a3b8;
-      --text: #f1f5f9;
-      --accent: #38bdf8;
-      --good: #22c55e;
-      --warn: #f59e0b;
-      --bad: #ef4444;
-      --purple: #a855f7;
+      --bg: #0f0a1f;
+      --panel: #1a1229;
+      --muted: #a8a3b8;
+      --text: #f5f3ff;
+      --accent: #c084fc;
+      --good: #10b981;
+      --warn: #fbbf24;
+      --bad: #f43f5e;
+      --purple: #8b5cf6;
+      --pink: #ec4899;
+      --cyan: #06b6d4;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
-      background: radial-gradient(ellipse 1200px 800px at 50% -200px, #1e1b4b, var(--bg));
+      background: radial-gradient(ellipse 1200px 800px at 50% -200px, #2d1b4e, var(--bg));
       color: var(--text);
       font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       min-height: 100dvh;
@@ -53,7 +55,7 @@
     h1 {
       font-size: clamp(22px, 4vw, 36px);
       font-weight: 800;
-      background: linear-gradient(135deg, #38bdf8, #a855f7);
+      background: linear-gradient(135deg, #c084fc, #ec4899, #06b6d4);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -146,31 +148,36 @@
     }
     
     .btn {
-      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
       border: none;
       color: white;
       font-weight: 600;
-      box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
     }
     
     .btn.good {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
     }
     
     .btn.bad {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+      background: linear-gradient(135deg, #f43f5e, #e11d48);
+      box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
     }
     
     .btn.purple {
-      background: linear-gradient(135deg, #a855f7, #9333ea);
-      box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+      background: linear-gradient(135deg, #c084fc, #a855f7);
+      box-shadow: 0 4px 15px rgba(192, 132, 252, 0.4);
     }
     
     .btn.orange {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+    }
+    
+    .btn.cyan {
+      background: linear-gradient(135deg, #06b6d4, #0891b2);
+      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
     }
     
     .stat {
@@ -208,14 +215,14 @@
       display: block;
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #22c55e, #84cc16);
+      background: linear-gradient(90deg, #10b981, #6ee7b7);
       transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
     }
     
     .meter.mood > i {
-      background: linear-gradient(90deg, #38bdf8, #818cf8);
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+      background: linear-gradient(90deg, #c084fc, #ec4899);
+      box-shadow: 0 0 10px rgba(192, 132, 252, 0.5);
     }
     
     .creature-wrap {
@@ -223,7 +230,7 @@
       height: 360px;
       display: grid;
       place-items: center;
-      background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.05), transparent 70%);
+      background: radial-gradient(circle at 50% 50%, rgba(192, 132, 252, 0.08), transparent 70%);
       border-radius: 20px;
     }
     
@@ -458,11 +465,11 @@
       position: fixed;
       top: 20px;
       right: 20px;
-      background: linear-gradient(135deg, #a855f7, #9333ea);
+      background: linear-gradient(135deg, #c084fc, #ec4899);
       color: white;
       padding: 16px 24px;
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+      box-shadow: 0 10px 30px rgba(192, 132, 252, 0.5);
       animation: slide-in 0.5s ease-out;
       z-index: 1000;
       font-weight: 600;
@@ -522,27 +529,28 @@
       font-size: 32px;
       display: grid;
       place-items: center;
-      background: rgba(56, 189, 248, 0.2);
-      border: 2px solid rgba(56, 189, 248, 0.3);
+      background: rgba(139, 92, 246, 0.15);
+      border: 2px solid rgba(139, 92, 246, 0.3);
       border-radius: 16px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
     
     .game-btn:hover {
-      background: rgba(56, 189, 248, 0.3);
+      background: rgba(139, 92, 246, 0.25);
+      border-color: rgba(139, 92, 246, 0.5);
       transform: scale(1.05);
     }
     
     .game-btn.active {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      border-color: #22c55e;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-color: #10b981;
       animation: pulse 0.3s ease;
     }
     
     .game-btn.wrong {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      border-color: #ef4444;
+      background: linear-gradient(135deg, #f43f5e, #e11d48);
+      border-color: #f43f5e;
       animation: wiggle 0.3s ease;
     }
     
@@ -550,7 +558,7 @@
       font-size: 48px;
       font-weight: 800;
       text-align: center;
-      background: linear-gradient(135deg, #38bdf8, #a855f7);
+      background: linear-gradient(135deg, #c084fc, #ec4899, #06b6d4);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -581,7 +589,7 @@
     .stat-value {
       font-size: 28px;
       font-weight: 800;
-      background: linear-gradient(135deg, #38bdf8, #a855f7);
+      background: linear-gradient(135deg, #c084fc, #ec4899);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -593,6 +601,55 @@
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.05em;
+    }
+    
+    /* Preset goals section */
+    .preset-goals {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .preset-btn {
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+    
+    .preset-btn:hover {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.5);
+      transform: translateX(4px);
+    }
+    
+    .preset-category {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--purple);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 12px 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .preset-category::before {
+      content: '';
+      width: 3px;
+      height: 14px;
+      background: var(--purple);
+      border-radius: 2px;
     }
   </style>
 </head>
@@ -648,12 +705,19 @@
       <section class="card">
         <div class="section-title">🎯 Objectifs quotidiens</div>
         
+        <!-- Preset goals -->
+        <div class="preset-goals" id="presetGoals"></div>
+        
+        <hr/>
+        
+        <div class="section-title" style="font-size: 14px; margin-bottom: 8px;">➕ Objectif personnalisé</div>
         <div class="row" style="gap:8px; margin-bottom:12px">
-          <input id="goalText" type="text" placeholder="Ex: 30 min de sport" style="flex: 1;" />
+          <input id="goalText" type="text" placeholder="Ex: Lire 30 pages" style="flex: 1;" />
           <input id="goalFood" type="number" min="1" max="10" value="1" style="width: 70px;" />
-          <button class="btn" id="btnAddGoal">➕</button>
+          <button class="btn cyan" id="btnAddGoal">Ajouter</button>
         </div>
         
+        <div class="section-title" style="font-size: 14px; margin-bottom: 8px;">📋 Mes objectifs actifs</div>
         <div id="goalList" class="goal-list"></div>
         
         <hr/>
@@ -737,11 +801,7 @@
       xp: 0,
       mood: 100,
       food: 0,
-      goals: [
-        { text: "Boire 1L d'eau", food: 1 },
-        { text: "30 min d'exercice", food: 2 },
-        { text: "Méditer 10 minutes", food: 1 }
-      ],
+      goals: [],
       history: [],
       lastMoodDecay: Date.now(),
       
@@ -765,6 +825,72 @@
       // Mini-game
       gameInProgress: false,
       lastPlayTime: 0
+    };
+
+    // ===== PRESET GOALS =====
+    const PRESET_GOALS = {
+      '💪 Santé & Sport': [
+        { text: '30 min d\'exercice', food: 2, emoji: '🏃' },
+        { text: '1h de sport intensif', food: 3, emoji: '💪' },
+        { text: '10 minutes d\'étirements', food: 1, emoji: '🧘' },
+        { text: 'Marcher 10 000 pas', food: 2, emoji: '🚶' },
+        { text: 'Faire du yoga', food: 2, emoji: '🧘‍♀️' },
+        { text: 'Aller courir', food: 2, emoji: '🏃‍♂️' }
+      ],
+      '💧 Hydratation & Nutrition': [
+        { text: 'Boire 1L d\'eau', food: 1, emoji: '💧' },
+        { text: 'Boire 2L d\'eau', food: 2, emoji: '💦' },
+        { text: 'Manger 5 fruits/légumes', food: 2, emoji: '🥗' },
+        { text: 'Cuisiner un repas sain', food: 2, emoji: '🍳' },
+        { text: 'Pas de sucre ajouté', food: 2, emoji: '🚫' },
+        { text: 'Prendre un petit-déjeuner', food: 1, emoji: '🥐' }
+      ],
+      '🧠 Mental & Bien-être': [
+        { text: 'Méditer 10 minutes', food: 1, emoji: '🧘' },
+        { text: 'Méditer 20 minutes', food: 2, emoji: '☯️' },
+        { text: 'Tenir un journal', food: 1, emoji: '📔' },
+        { text: 'Pas d\'écran 1h avant dormir', food: 2, emoji: '📵' },
+        { text: 'Exercice de respiration', food: 1, emoji: '🌬️' },
+        { text: 'Gratitude (3 choses)', food: 1, emoji: '🙏' }
+      ],
+      '📚 Apprentissage': [
+        { text: 'Lire 30 minutes', food: 2, emoji: '📖' },
+        { text: 'Lire 1 chapitre', food: 1, emoji: '📚' },
+        { text: 'Apprendre quelque chose', food: 2, emoji: '🎓' },
+        { text: 'Regarder un cours en ligne', food: 2, emoji: '💻' },
+        { text: 'Pratiquer une langue', food: 2, emoji: '🗣️' },
+        { text: 'Écouter un podcast', food: 1, emoji: '🎧' }
+      ],
+      '✨ Productivité': [
+        { text: 'Terminer une tâche importante', food: 3, emoji: '✅' },
+        { text: 'Ranger son bureau', food: 1, emoji: '🗂️' },
+        { text: 'Planifier sa journée', food: 1, emoji: '📅' },
+        { text: 'Session Pomodoro (25 min)', food: 2, emoji: '🍅' },
+        { text: 'Vider sa boîte mail', food: 2, emoji: '📧' },
+        { text: 'Ranger 1 espace', food: 1, emoji: '🧹' }
+      ],
+      '🎨 Créativité & Loisirs': [
+        { text: 'Dessiner/Peindre', food: 2, emoji: '🎨' },
+        { text: 'Jouer d\'un instrument', food: 2, emoji: '🎸' },
+        { text: 'Écrire créativement', food: 2, emoji: '✍️' },
+        { text: 'Faire du bricolage', food: 2, emoji: '🔨' },
+        { text: 'Prendre des photos', food: 1, emoji: '📸' },
+        { text: 'Activité manuelle', food: 2, emoji: '✂️' }
+      ],
+      '👥 Social': [
+        { text: 'Appeler un proche', food: 1, emoji: '📞' },
+        { text: 'Envoyer un message gentil', food: 1, emoji: '💬' },
+        { text: 'Sortir avec des amis', food: 2, emoji: '👥' },
+        { text: 'Aider quelqu\'un', food: 2, emoji: '🤝' },
+        { text: 'Complimenter 3 personnes', food: 1, emoji: '💖' },
+        { text: 'Temps en famille', food: 2, emoji: '👨‍👩‍👧' }
+      ],
+      '😴 Sommeil': [
+        { text: 'Dormir 8h', food: 2, emoji: '😴' },
+        { text: 'Se coucher avant 23h', food: 2, emoji: '🌙' },
+        { text: 'Se lever tôt (avant 7h)', food: 2, emoji: '⏰' },
+        { text: 'Sieste de 20 min', food: 1, emoji: '💤' }
+      ]
     };
 
     // ===== CONSTANTS =====
@@ -814,7 +940,48 @@
         day: '2-digit'
       }).format(date);
 
-    // ===== HISTORY =====
+    // ===== PRESET GOALS RENDERING =====
+    function renderPresetGoals() {
+      const container = $('#presetGoals');
+      container.innerHTML = '';
+      
+      Object.entries(PRESET_GOALS).forEach(([category, goals]) => {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'preset-category';
+        categoryDiv.textContent = category;
+        container.appendChild(categoryDiv);
+        
+        goals.forEach(goal => {
+          const btn = document.createElement('button');
+          btn.className = 'preset-btn';
+          btn.innerHTML = `
+            <span>${goal.emoji} ${goal.text}</span>
+            <span class="goal-reward">${goal.food} 🍎</span>
+          `;
+          btn.onclick = () => addPresetGoal(goal);
+          container.appendChild(btn);
+        });
+      });
+    }
+    
+    function addPresetGoal(presetGoal) {
+      // Check if already exists
+      const exists = state.goals.some(g => g.text === presetGoal.text);
+      if (exists) {
+        pushHistory(`⚠️ Objectif déjà ajouté: "${presetGoal.text}"`);
+        render();
+        return;
+      }
+      
+      state.goals.unshift({ 
+        text: presetGoal.text, 
+        food: presetGoal.food 
+      });
+      
+      pushHistory(`📝 Objectif ajouté: "${presetGoal.text}"`);
+      spawnParticles('✨', 3);
+      render();
+    }
     function pushHistory(text) {
       state.history.unshift({ t: Date.now(), text });
       state.history = state.history.slice(0, 100);
@@ -1527,13 +1694,15 @@
     createStars();
     load();
     checkStreak();
+    renderPresetGoals();
     render();
     
     setInterval(decay, 1000);
     setInterval(persist, 30000);
     
     console.log('🎮 Ma Petite Créature v3 chargée !');
-    console.log('✨ Nouvelles fonctionnalités: Streaks, Mini-jeu, Statistiques');
+    console.log('✨ Nouvelles fonctionnalités: Streaks, Mini-jeu, Statistiques, Objectifs préfaits');
+    console.log('🎨 Nouveau thème de couleurs: violet, rose, cyan');
   </script>
 </body>
 </html>
